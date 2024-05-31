@@ -94,12 +94,6 @@ void task_led(void *parameters)
 	/*  Declare & Initialize Task Function variables for argument, led, button and task */
 	led_config_t *p_led_config = (led_config_t *)parameters;
 
-	//TickType_t last_wake_time;
-
-	/* The xLastWakeTime variable needs to be initialized with the current tick
-	   count. ws*/
-	//last_wake_time = xTaskGetTickCount();
-
 	char *p_task_name = (char *)pcTaskGetName(NULL);
 
 	/* Print out: Application Update */
@@ -131,64 +125,27 @@ void task_led(void *parameters)
 		/* Update Task Led Counter */
 		g_task_led_cnt++;
 
-		/* Check Queue Messages */
-		/*if (0 != uxQueueMessagesWaiting(p_led_config->queue_handle))
-		{
-			xQueueReceive(p_led_config->queue_handle, &received_value, 0);
+		if (xSemaphoreTake(p_led_config->sempahore_handle, portMAX_DELAY) == pdPASS) {
+			if (BLINKING == (p_led_config->led_flag)) {
+				/* Check, Update and Print Led State */
+				if (GPIO_PIN_RESET == (p_led_config->led_state)) {
+					p_led_config->led_state = GPIO_PIN_SET;
+				} else {
+					p_led_config->led_state = GPIO_PIN_RESET;
 
-			p_led_config->led_flag = received_value;
-		}*/
+				}
+			} else {
+				/* Check, Update and Print Led State */
+				if (GPIO_PIN_RESET == (p_led_config->led_state)) {
+					p_led_config->led_state = GPIO_PIN_SET;
 
-		/* Check Led Flag */
-		if (BLINKING == (p_led_config->led_flag))
-		{
-
-			/* Check, Update and Print Led State */
-			if (GPIO_PIN_RESET == (p_led_config->led_state))
-			{
-				p_led_config->led_state = GPIO_PIN_SET;
-
-				/* Print out: Task execution */
-				//LOGGER_LOG("  %s - %s\r\n", p_task_name, p_task_led_t_on);
+				} else {
+					p_led_config->led_state = GPIO_PIN_RESET;
+				}
 			}
-			else
-			{
-
-				p_led_config->led_state = GPIO_PIN_RESET;
-
-				/* Print out: Task execution */
-				//LOGGER_LOG("  %s - %s\r\n", p_task_name, p_task_led_t_off);
-			}
-
-			/* Update HW Led State */
-		    HAL_GPIO_WritePin(p_led_config->led_gpio_port, p_led_config->led_pin, p_led_config->led_state);
-		    xSemaphoreTake(p_led_config->sempahore_handle, portMAX_DELAY);
-		}else{
-			/* Check, Update and Print Led State */
-			if (GPIO_PIN_RESET == (p_led_config->led_state))
-			{
-				p_led_config->led_state = GPIO_PIN_SET;
-
-				/* Print out: Task execution */
-				//LOGGER_LOG("  %s - %s\r\n", p_task_name, p_task_led_t_on);
-			}
-			else{
-
-				p_led_config->led_state = GPIO_PIN_RESET;
-
-				/* Print out: Task execution */
-				//LOGGER_LOG("  %s - %s\r\n", p_task_name, p_task_led_t_off);
-			}
-
-			/* Update HW Led State */
 			HAL_GPIO_WritePin(p_led_config->led_gpio_port, p_led_config->led_pin, p_led_config->led_state);
-			 xSemaphoreTake(p_led_config->sempahore_handle, portMAX_DELAY);
 		}
 
-
-
-		/* We want this task to execute exactly every 250 milliseconds. */
-		//vTaskDelayUntil(&last_wake_time, LED_TICK_CNT_MAX);
 
 		#endif
 

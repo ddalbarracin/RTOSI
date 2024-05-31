@@ -95,9 +95,7 @@ void task_button(void *parameters)
 
 	/*  Declare & Initialize Task Function variables for argument, led, button and task */
 	btn_config_t *p_btn_config = (btn_config_t *)parameters;
-
 	static led_flag_t led_flg = NOT_BLINKING;
-
 	char *p_task_name = (char *)pcTaskGetName(NULL);
 
 	/* Print out: Application Update */
@@ -121,28 +119,19 @@ void task_button(void *parameters)
 	for (;;)
 	{
 
-		#if (TEST_X == TEST_0)
+#if (TEST_X == TEST_0)
 
-		/* Update Task A Counter */
+		/* Update Task Counter */
 		g_task_btn_cnt++;
 
 		/* Check HW Button State */
 		p_btn_config->btn_state = HAL_GPIO_ReadPin(p_btn_config->btn_gpio_port, p_btn_config->btn_pin);
-		if (BTN_PRESSED == p_btn_config->btn_state)
-		{
-			/* Check, Update and Print Led Flag */
-			if (NOT_BLINKING == led_flg)
-			{
+		if (BTN_PRESSED == p_btn_config->btn_state) {
+			if (NOT_BLINKING == led_flg) {
 				led_flg = BLINKING;
-
-				/* Print out: Task execution */
 				LOGGER_LOG("  %s - %s\r\n", p_task_name, p_task_blinking_on);
-			}
-			else
-			{
+			} else {
 				led_flg = NOT_BLINKING;
-
-				/* Print out: Task execution */
 				LOGGER_LOG("  %s - %s\r\n", p_task_name, p_task_blinking_off);
 			}
 			/* button task gives the semaphore to led task */
