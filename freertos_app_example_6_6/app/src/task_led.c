@@ -148,17 +148,8 @@ void task_led(void *parameters)
 		{
 			xSemaphoreTake(p_led_config->mutex_semaphore_handle, portMAX_DELAY);
         	/* Check, Update and Print Led Flag */
-			if (NOT_BLINKING == led_blinking_flag)
-			{
-				p_led_config->led_flag = BLINKING;
-			}
-			else
-			{
-				p_led_config->led_flag = NOT_BLINKING;
-
-			}
-
 			p_led_config->led_flag = led_blinking_flag;
+
 			xSemaphoreGive(p_led_config->mutex_semaphore_handle);
 		}
 
